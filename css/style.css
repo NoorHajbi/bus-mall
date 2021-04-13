@@ -1,0 +1,17 @@
+body{
+    background-color: beige;
+    box-sizing: border-box;
+}
+header{
+    margin: 10em;
+    display: inline-block;
+    padding: 10px;
+}
+
+section{
+    display: inline-block;
+    padding: 10px;
+}
+ul li {
+    margin-left: 0px;
+}
