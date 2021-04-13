@@ -1,25 +1,6 @@
 'use strict';
 
-/*
-
-don’t forget a custom font, color palette, layout with semantic HTML, and so on.
-img width height
----
-Create a constructor function that creates an object associated with each product,
-and has the following properties:
-Name of the product
-File path of image
-Times the image has been shown
-
----
-For each of the three images, increment its property of times it has been shown by one.
----
-After voting rounds have been completed, remove the event listeners on the product.
-Add a button with the text View Results,
-which when clicked displays the list of all the products followed by the votes received,
-and number of times seen for each. Example: banana had 3 votes, and was seen 5 times.
-*/
-
+let imgContainer = document.getElementById('imgContainer');
 let leftImg= document.getElementById('left-image');
 let middleImg= document.getElementById('middle-image');
 let rightImg= document.getElementById('right-image');
@@ -30,11 +11,11 @@ let userAttemptsCounter=0;
 let leftImageIndex;
 let middleImageIndex;
 let rightImageIndex;
-//let button = document.createElement('button');
 
 function ImageIndex(name, path) {
   this.name=name;
   this.path = path;
+  //this.path=`img/${name}.jpg`; //if it is possible for all extensions
   this.votes=0;
   this.timesShown=0;
   ImageIndex.allImages.push(this);
@@ -82,63 +63,64 @@ function renderThreeImages() {
   while (leftImageIndex===rightImageIndex||middleImageIndex===rightImageIndex||middleImageIndex===leftImageIndex)
   {
     rightImageIndex=generateRandomIndex();
-    //middleImageIndex=generateRandomIndex();
+    middleImageIndex=generateRandomIndex();
   }
-  //timesshown
   leftImg.src=ImageIndex.allImages[leftImageIndex].path;
+  ImageIndex.allImages[leftImageIndex].timesShown++;
   middleImg.src=ImageIndex.allImages[middleImageIndex].path;
+  ImageIndex.allImages[middleImageIndex].timesShown++;
   rightImg.src=ImageIndex.allImages[rightImageIndex].path;
+  ImageIndex.allImages[rightImageIndex].timesShown++;
 }
 renderThreeImages();
 
 // handle clicking:
-leftImg.addEventListener('click',handleUserClick);
-middleImg.addEventListener('click',handleUserClick);
-rightImg.addEventListener('click',handleUserClick);
+imgContainer.addEventListener('click', handleUserClick);
+//leftImg.addEventListener('click',handleUserClick);
+//middleImg.addEventListener('click',handleUserClick);
+//rightImg.addEventListener('click',handleUserClick);
 
 
 function handleUserClick(event) {
   console.log(event.target.id);
-
   // add to attempts
   userAttemptsCounter++;
-
   console.log(userAttemptsCounter);
-  //samer's explination from goat project:
-  // if the attempts is lower than the max tries
-  // - add to the votes based on the id
-  // -render again
-  // Else
-  // show the list
-  // and finaly remove the clicking
-
+  //add votes
   if (userAttemptsCounter<=maxAttempts) {
     if (event.target.id ==='left-image')
       ImageIndex.allImages[leftImageIndex].votes++;
     else if(event.target.id ==='middle-image')
       ImageIndex.allImages[middleImageIndex].votes++;
-    else
+    else if(event.target.id ==='right-image')
       ImageIndex.allImages[rightImageIndex].votes++;
-
+    else{ // handle, when user click on the image comtainer and outsides images, we don't need to count anything.
+      alert('Please click on the images');
+      userAttemptsCounter--;
+    }
     console.log(ImageIndex.allImages);
     renderThreeImages();
-  }else{
+  }
+  else{ //comeback
     //show output
-    let list=document.getElementById('resultContainer');
+    let button=document.getElementById('button');
+    button.addEventListener('click',showList);
+    button.hidden=false;
     let imgsResult;
-
-
-    for (let i = 0; i < ImageIndex.allImages.length; i++) {
-      imgsResult=document.createElement('li');
-      list.appendChild(imgsResult);
-
-      imgsResult.textContent=`${ImageIndex.allImages[i].name}: ${ImageIndex.allImages[i].votes} votes, and was seen - times`;
+    let list=document.getElementById('resultContainer');
+    function showList(){
+      for (let i = 0; i < ImageIndex.allImages.length; i++) {
+        imgsResult=document.createElement('li');
+        list.appendChild(imgsResult);
+        imgsResult.textContent=`${ImageIndex.allImages[i].name} had ${ImageIndex.allImages[i].votes} votes, and was seen ${ImageIndex.allImages[i].timesShown} times`;
+      }
+      button.removeEventListener('click',showList);
     }
-    //  remove event listener
-    //list.appendChild(button);
-    leftImg.removeEventListener('click',handleUserClick);
-    middleImg.removeEventListener('click',handleUserClick);
-    rightImg.removeEventListener('click',handleUserClick);
+    imgContainer.removeEventListener('click',handleUserClick);
+    //leftImg.removeEventListener('click',handleUserClick);
+    //middleImg.removeEventListener('click',handleUserClick);
+    //rightImg.removeEventListener('click',handleUserClick);
   }
 
 }
+
