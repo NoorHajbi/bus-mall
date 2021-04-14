@@ -1,6 +1,10 @@
 'use strict';
-
+/*ideas before code: if one of them included ,
+ generate a new random number,
+ 3 elements
+cuz every3 imgs replaced by new 3 imges */
 let imgContainer = document.getElementById('imgContainer');
+let button=document.getElementById('button');
 let leftImg= document.getElementById('left-image');
 let middleImg= document.getElementById('middle-image');
 let rightImg= document.getElementById('right-image');
@@ -11,14 +15,16 @@ let userAttemptsCounter=0;
 let leftImageIndex;
 let middleImageIndex;
 let rightImageIndex;
-
+let nameArray=[];
+let votesArray=[];
+let timesShownArray=[];
 function ImageIndex(name, path) {
   this.name=name;
   this.path = path;
-  //this.path=`img/${name}.jpg`; //if it is possible for all extensions
   this.votes=0;
   this.timesShown=0;
   ImageIndex.allImages.push(this);
+  nameArray.push(this.name);
 }
 
 ImageIndex.allImages=[];
@@ -55,15 +61,21 @@ function generateRandomIndex() {
 console.log(generateRandomIndex()); //12
 
 function renderThreeImages() {
-
-  leftImageIndex=generateRandomIndex();
-  middleImageIndex= generateRandomIndex();
-  rightImageIndex=generateRandomIndex();
-  //to dispaly imgs
-  while (leftImageIndex===rightImageIndex||middleImageIndex===rightImageIndex||middleImageIndex===leftImageIndex)
-  {
-    rightImageIndex=generateRandomIndex();
-    middleImageIndex=generateRandomIndex();
+  let leftImg1= leftImageIndex,
+    rightImg1= rightImageIndex, middleImg1 = middleImageIndex;
+  //leftImageIndex=generateRandomIndex();
+  //middleImageIndex= generateRandomIndex();
+  //rightImageIndex=generateRandomIndex();
+  //to dispaly imgs and replace repeated images each 2 rounds
+  while(leftImg1===leftImageIndex||leftImg1===middleImageIndex||leftImg1===rightImageIndex||
+    middleImg1===leftImageIndex||middleImg1===middleImageIndex||middleImg1===rightImageIndex ||
+    rightImg1===leftImageIndex||rightImg1===middleImageIndex||rightImg1===rightImageIndex){
+    leftImageIndex=generateRandomIndex();
+    while (leftImageIndex===rightImageIndex||middleImageIndex===rightImageIndex||middleImageIndex===leftImageIndex)
+    {
+      rightImageIndex=generateRandomIndex();
+      middleImageIndex=generateRandomIndex();
+    }
   }
   leftImg.src=ImageIndex.allImages[leftImageIndex].path;
   ImageIndex.allImages[leftImageIndex].timesShown++;
@@ -103,24 +115,73 @@ function handleUserClick(event) {
   }
   else{ //comeback
     //show output
-    let button=document.getElementById('button');
     button.addEventListener('click',showList);
     button.hidden=false;
-    let imgsResult;
-    let list=document.getElementById('resultContainer');
-    function showList(){
-      for (let i = 0; i < ImageIndex.allImages.length; i++) {
-        imgsResult=document.createElement('li');
-        list.appendChild(imgsResult);
-        imgsResult.textContent=`${ImageIndex.allImages[i].name} had ${ImageIndex.allImages[i].votes} votes, and was seen ${ImageIndex.allImages[i].timesShown} times`;
-      }
-      button.removeEventListener('click',showList);
+    /****/
+    for (let i = 0; i < ImageIndex.allImages.length; i++) {
+      votesArray.push(ImageIndex.allImages[i].votes);
+      timesShownArray.push(ImageIndex.allImages[i].timesShown);
     }
+    console.log(votesArray);
+
+    // show the chart
+    chart();
     imgContainer.removeEventListener('click',handleUserClick);
     //leftImg.removeEventListener('click',handleUserClick);
     //middleImg.removeEventListener('click',handleUserClick);
     //rightImg.removeEventListener('click',handleUserClick);
   }
+
+}
+
+function showList(){
+  let imgsResult;
+  let list=document.getElementById('resultContainer');
+  for (let i = 0; i < ImageIndex.allImages.length; i++) {
+    imgsResult=document.createElement('li');
+    list.appendChild(imgsResult);
+    imgsResult.textContent=`${ImageIndex.allImages[i].name} had ${ImageIndex.allImages[i].votes} votes, and was seen ${ImageIndex.allImages[i].timesShown} times`;
+  }
+  button.removeEventListener('click',showList);
+}
+// chart.js
+function chart() {
+  let ctx = document.getElementById('myChart').getContext('2d');
+
+  let chart= new Chart(ctx,{
+    // what type is the chart
+    type: 'bar',
+
+    //  the data for showing
+    data:{
+    //  for the names
+      labels: nameArray,
+
+      datasets: [
+        {
+          label: 'Images votes',
+          data: votesArray,
+          backgroundColor: [
+            'rgb(251, 93, 76)',
+          ],
+
+          borderWidth: 1
+        },
+
+        {
+          label: 'Images shown',
+          data: timesShownArray,
+          backgroundColor: [
+            'black',
+          ],
+
+          borderWidth: 1
+        }
+
+      ]
+    },
+    options: {}
+  });
 
 }
 
