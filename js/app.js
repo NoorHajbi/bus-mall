@@ -1,17 +1,11 @@
 'use strict';
-/*ideas before code: if one of them included ,
- generate a new random number,
- 3 elements
-cuz every3 imgs replaced by new 3 imges */
 let imgContainer = document.getElementById('imgContainer');
 let button=document.getElementById('button');
 let leftImg= document.getElementById('left-image');
 let middleImg= document.getElementById('middle-image');
 let rightImg= document.getElementById('right-image');
-
 let maxAttempts=25;
 let userAttemptsCounter=0;
-
 let leftImageIndex;
 let middleImageIndex;
 let rightImageIndex;
@@ -26,10 +20,32 @@ function ImageIndex(name, path) {
   ImageIndex.allImages.push(this);
   nameArray.push(this.name);
 }
-
+/* To store all */
 ImageIndex.allImages=[];
 
+/**Setter**/
+function setStorage() {
+  let arrayString=JSON.stringify(ImageIndex.allImages);
+  console.log(arrayString);
+  localStorage.setItem('Images',arrayString);
+}
 
+/**Getter**/
+function getStorage() {
+  // get the data from the local storage
+  let data =localStorage.getItem('Images');
+  console.log(data);
+  // convert data back into a normal array of objects
+  let imagesData=JSON.parse(data);
+  console.log(imagesData);
+  // if the first time we visit the page, there will not be an array of objects inside the local storage so we should handle it here:
+  if (imagesData !==null) {
+    ImageIndex.allImages=imagesData;
+  }
+
+  renderThreeImages();
+
+}
 // instantces
 new ImageIndex('bag','img/bag.jpg');
 new ImageIndex('banana','img/banana.jpg');
@@ -112,6 +128,7 @@ function handleUserClick(event) {
     }
     console.log(ImageIndex.allImages);
     renderThreeImages();
+    setStorage();
   }
   else{ //comeback
     //show output
@@ -185,3 +202,4 @@ function chart() {
 
 }
 
+getStorage();
